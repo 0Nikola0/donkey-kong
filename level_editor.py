@@ -65,8 +65,10 @@ tiles1 = []
 tiles2 = []
 tiles3 = []
 
+clock = pygame.time.Clock()
 running = True
 while running:
+    clock.tick(30)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
