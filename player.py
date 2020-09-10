@@ -24,17 +24,23 @@ class Player:
         self.jumpHeight = 10
         self.jumpCount = self.jumpHeight
 
+        # Load the sprites and set self to idle
         sheet = SpriteSheet()
-        self.image = sheet.get_image('player_idle', scale=(self.sizex, self.sizey))
+        self.image_idle = sheet.get_image('player_idle', scale=(self.sizex, self.sizey))
+        self.image_right = sheet.get_image('player_right', scale=(self.sizex, self.sizey))
+        self.image_left = pygame.transform.flip(self.image_right, True, False)
+        self.image = self.image_idle
     
     def move(self, pkeys):
         # Updating the player position based on which button is pressed
         if pkeys[pygame.K_a] and self.posx - 5 > 0:
             self.posx -= self.vel
             self.rect.topleft = (round(self.posx), round(self.posy))
+            self.image = self.image_left
         if pkeys[pygame.K_d] and self.posx + self.sizex + 5 < screenWidth:
             self.posx += self.vel
             self.rect.topleft = (round(self.posx), round(self.posy))
+            self.image = self.image_right
         # Space is only registered if you're not already in jump
         if not self.isJump:    
             if pkeys[pygame.K_SPACE]:
