@@ -9,10 +9,11 @@ import pygame
 file_name = "resources/images/monkeylad_further.png"
 
 NAME = {
-    'player_idle' :  (448, 208 , 16, 24),
-    'player_right' :  (448 + 16, 208 , 16, 24),
+    'player_idle':  (448, 208, 16, 24),
+    'player_right':  (448 + 16, 208, 16, 24),
     'rock': (880, 16, 16, 16),
 }
+
 
 class SpriteSheet:
     def __init__(self):
@@ -24,7 +25,6 @@ class SpriteSheet:
             image = pygame.transform.scale(image, scale)
 
         return image
-
 
     def get_image_by_coordinates(self, x, y, width, height):
         image = pygame.Surface([width, height], pygame.SRCALPHA)

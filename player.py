@@ -110,7 +110,6 @@ clock = pygame.time.Clock()
 loaded_tiles = level_loader("level01")
 tiles = []
 for tile in loaded_tiles:
-    print(tile["type"])
     tiles.append(Tiles(tile["type"], tile["pos"]))
 
 Gravity = 15     # How fast the player falls (how fast is the player pulled to the ground)
