@@ -9,8 +9,9 @@ import pygame
 file_name = "resources/images/monkeylad_further.png"
 
 NAME = {
-    "player_idle" :  (448, 208 , 16, 24),
-    "player_right" :  (448 + 16, 208 , 16, 24),
+    'player_idle' :  (448, 208 , 16, 24),
+    'player_right' :  (448 + 16, 208 , 16, 24),
+    'rock': (880, 16, 16, 16),
 }
 
 class SpriteSheet:

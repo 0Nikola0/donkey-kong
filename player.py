@@ -85,6 +85,11 @@ Gravity = 15     # How fast the player falls (how fast is the player pulled to t
 platform = Platform()
 player = Player()
 
+# ROCK DEMO
+sheet = SpriteSheet()
+rock = sheet.get_image('rock', scale=(32,31))
+# ROCK DEMO
+
 running = True
 while running:
     clock.tick(30)
@@ -99,6 +104,11 @@ while running:
 
     player.move(keys)
     player.gravity()
+
+    # ROCK DEMO
+    for x in range(0, 640, 32):
+        screen.blit(rock, (x, 350)) 
+    # ROCK DEMO
 
     platform.display()
     player.display()
