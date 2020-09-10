@@ -1,5 +1,6 @@
 import pygame
 from graphics import SpriteSheet
+import json
 
 
 # Need to replace platform with tiles, but i dont know if i can do the collisions correct -Nikola
@@ -11,6 +12,26 @@ class Platform:
     
     def display(self):
         pygame.draw.rect(screen, Green, self.rect)
+
+
+class Tiles:
+    def __init__(self, tile_type, pos):
+        self.sizex, self.sizey = 50, 50
+        self.posx, self.posy = pos
+        self.type = tile_type
+        self.rect = pygame.Rect(self.posx, self.posy, self.sizex, self.sizey)
+
+    def display(self):
+        # Draws empty green rect if available and blue filled if not
+        pygame.draw.rect(screen, Green if self.type == 1 else Blue if
+                         self.type == 2 else Red if self.type == 3 else White, self.rect)
+        # For when we add texture to the tiles
+        """
+        if not self.available:
+            screen.blit(tiles_img, self.pos)
+        else:
+            pygame.draw.rect(screen, Green, self.rect, 1)
+        """
 
 
 class Player:
@@ -66,8 +87,14 @@ class Player:
             self.rect.topleft = (round(self.posx), round(self.posy))
 
     def display(self):
-        #pygame.draw.rect(screen, Blue, self.rect)
+        # pygame.draw.rect(screen, Blue, self.rect)
         screen.blit(self.image, self.rect)
+
+
+def level_loader(lvl):
+    file = open(f"{lvl}/tiles.json")
+    l_tiles = json.load(file)
+    return l_tiles
 
 
 White = (255, 255, 255)
@@ -80,14 +107,19 @@ pygame.init()
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 clock = pygame.time.Clock()
 
-Gravity = 15     # How fast the player falls (how fast is the player pulled to the ground)
+loaded_tiles = level_loader("level01")
+tiles = []
+for tile in loaded_tiles:
+    print(tile["type"])
+    tiles.append(Tiles(tile["type"], tile["pos"]))
 
+Gravity = 15     # How fast the player falls (how fast is the player pulled to the ground)
 platform = Platform()
 player = Player()
 
 # ROCK DEMO
 sheet = SpriteSheet()
-rock = sheet.get_image('rock', scale=(32,31))
+rock = sheet.get_image('rock', scale=(32, 31))
 # ROCK DEMO
 
 running = True
@@ -107,12 +139,14 @@ while running:
 
     # ROCK DEMO
     for x in range(0, 640, 32):
-        screen.blit(rock, (x, 350)) 
+        screen.blit(rock, (x, 350))
     # ROCK DEMO
 
-    platform.display()
+    # The player doesnt interact with the tiles yet, it does with the platform
+    for tile in tiles:
+        tile.display()
+    # platform.display()
     player.display()
     pygame.display.flip()
 
 pygame.quit()
-    
