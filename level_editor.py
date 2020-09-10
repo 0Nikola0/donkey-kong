@@ -31,11 +31,6 @@ class Tiles:
 
 def save_tiles(s_tiles: list, lvl: str):
     # Level folder must exist before saving the tiles in selected folder
-    """
-    s_tiles ex: tiles1[]
-    tiles_type ex: ladders
-    lvl ex: 01
-    """
     # Saves the pos of the occupied type X tiles
     json_file = open(f"level{lvl}/tiles.json", "w")
     json.dump(s_tiles, json_file)
