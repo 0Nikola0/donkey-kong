@@ -1,4 +1,5 @@
 import pygame
+from graphics import SpriteSheet
 
 
 # Need to replace platform with tiles, but i dont know if i can do the collisions correct -Nikola
@@ -15,13 +16,16 @@ class Platform:
 class Player:
     def __init__(self):
         self.posx, self.posy = 400, 300
-        self.sizex, self.sizey = 40, 70
+        self.sizex, self.sizey = 40, 60
         self.rect = pygame.Rect(self.posx, self.posy, self.sizex, self.sizey)
         self.vel = 10
         # The jumping code is from a tutorial i watched a while ago, idk if there's a better way to do it -Nikola
         self.isJump = False
         self.jumpHeight = 10
         self.jumpCount = self.jumpHeight
+
+        sheet = SpriteSheet()
+        self.image = sheet.get_image('player_idle', scale=(self.sizex, self.sizey))
     
     def move(self, pkeys):
         # Updating the player position based on which button is pressed
@@ -56,7 +60,8 @@ class Player:
             self.rect.topleft = (round(self.posx), round(self.posy))
 
     def display(self):
-        pygame.draw.rect(screen, Blue, self.rect)
+        #pygame.draw.rect(screen, Blue, self.rect)
+        screen.blit(self.image, self.rect)
 
 
 White = (255, 255, 255)
