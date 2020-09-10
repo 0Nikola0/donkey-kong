@@ -48,11 +48,11 @@ class Player:
     def gravity(self):
         # Jumping feature already pulls the player down if in jump so this runs only if player is not in jump
         if not self.isJump:
-            if self.posy + self.sizey + Gravity <= platform.posy:
+            if self.posy + self.sizey < platform.posy:
                 self.posy += Gravity
             # If the player glitches and his position is below the platform this puts him on top of it
-            if self.posy > platform.posy:
-                self.posy = platform.posy + self.sizey
+            if self.posy + self.sizey > platform.posy:
+                self.posy = platform.posy - self.sizey
             self.rect.topleft = (round(self.posx), round(self.posy))
 
     def display(self):
