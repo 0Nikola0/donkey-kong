@@ -34,10 +34,10 @@ class Player(pygame.sprite.Sprite):
         self.k_jump = keys['jump']
 
     def handle_key_down(self, key):
-        if key == self.k_move_left and self.posx - 5 > 0:
+        if key == self.k_move_left:
             self.current_vel = -self.vel
             self.image = self.image_left
-        elif key == self.k_move_right and self.posx + self.sizex + 5 < s.SCREEN_WIDTH:
+        elif key == self.k_move_right:
             self.current_vel = self.vel
             self.image = self.image_right
         elif key == self.k_jump and not self.isJump:
@@ -51,8 +51,12 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, *args):
         """Move player if he jumped or have velocity"""
-        if self.current_vel != 0:  # move case
-            self.rect.move_ip((self.current_vel, 0))
+        if self.current_vel > 0:
+            if self.rect.right + 5 < s.SCREEN_WIDTH:
+                self.rect.move_ip((self.current_vel, 0))
+        elif self.current_vel < 0:
+            if self.rect.left - 5 > 0:
+                self.rect.move_ip((self.current_vel, 0))
 
         if self.isJump:  # jump case
             if self.jumpCount >= -self.jumpHeight:
