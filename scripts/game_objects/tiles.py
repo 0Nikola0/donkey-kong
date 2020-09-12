@@ -20,4 +20,10 @@ class Tiles(pygame.sprite.Sprite):
             color = s.WHITE
         image = pygame.Surface((s.TILE_SIZE, s.TILE_SIZE))
         image.fill(color)
+
+        if color == s.WHITE:
+            inner_color = pygame.Surface((s.TILE_SIZE, s.TILE_SIZE))
+            inner_color.fill(s.GRAY)
+            image.blit(inner_color, (1, 1))
+
         return image

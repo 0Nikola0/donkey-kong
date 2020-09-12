@@ -1,87 +1,71 @@
 import pygame
 import json
 import settings as s
-
-class Tiles:
-    def __init__(self, pos, size):
-        self.pos = pos
-        self.size = size
-        self.rect = pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
-        self.available = True
-        self.type = 0
-
-    def clicked(self, ev):
-        if self.rect.collidepoint(ev.pos[0], ev.pos[1]):
-            # Changing the availability on click (if available and clicked it changes to not available and vice versa)
-            self.type = (self.type + 1) if self.type < 3 else 0
-            self.available = True if self.type == 0 else False
-
-    def draw(self):
-        # Draws empty green rect if available and blue filled if not
-        pygame.draw.rect(screen, s.GREEN if self.type == 1 else s.BLUE if self.type == 2 else s.RED if self.type == 3
-                         else s.WHITE, self.rect, 1 if self.available else 0)
-        # For when I add texture to the tiles
-        """
-        if not self.available:
-            screen.blit(tiles_img, self.pos)
-        else:
-            pygame.draw.rect(screen, Green, self.rect, 1)
-        """
+from scripts.game_objects.background import BackGround
+from scripts.main_loop import MainLoop
+from scripts.level_editor_objects.tiles import Tiles
 
 
 def save_tiles(s_tiles: list, lvl: str):
-    # Level folder must exist before saving the tiles in selected folder
-    # Saves the pos of the occupied type X tiles
-    json_file = open(f"level{lvl}/tiles.json", "w")
+    """Saves the pos of the occupied type X tiles
+
+    Level folder must exist before saving the tiles in selected folder
+    """
+    json_file = open(f"../level{lvl}/tiles.json", "w")
     json.dump(s_tiles, json_file)
 
 
-screen_size = s.SCREEN_SIZE
-pygame.init()
-pygame.display.set_caption("Level Editor")
-screen = pygame.display.set_mode(screen_size)
+class LevelEditor(MainLoop):
+    def __init__(self):
+        super(LevelEditor, self).__init__('Lever Editor', s.SCREEN_SIZE, s.FRAME_RATE)
+        self.background = pygame.sprite.Group()
+        self.create_background()
+        self.tiles = pygame.sprite.Group()
+        self.create_grip()
 
-# Creating grid of xTiles
-tiles = []
-tile_posx, tile_posy = 0, 0
-tile_size = s.TILE_SIZE
-for ver in range(12):
-    for hor in range(16):
-        tiles.append(Tiles((tile_posx, tile_posy), (tile_size, tile_size)))
-        tile_posx += tile_size
-    tile_posy += tile_size  # Changing the y pos to the next line
-    tile_posx = 0  # Resetting the x pos so it is from the starting position again
+        self.k_save = s.K_SAVE
+        self.keyup_handlers[s.K_SAVE].append(self.handle_keyup)
+
+    def create_background(self):
+        self.background.add(BackGround(
+            s.SCREEN_WIDTH,
+            s.SCREEN_HEIGHT,
+            s.GRAY,
+        ))
+        self.all_objects_groups.append(self.background)
+
+    def create_grip(self):
+        for ver in range(s.NUM_TILES_IN_COLUMN):
+            for hor in range(s.NUM_TILES_IN_ROW):
+                t = Tiles((hor * s.TILE_SIZE, ver * s.TILE_SIZE))
+                self.tiles.add(t)
+                self.mouse_handlers.append(t.handle_mouse_event)
+        self.all_objects_groups.append(self.tiles)
+
+    def handle_keyup(self, key):
+        if key == self.k_save:
+            self.save()
+
+    def save(self):
+        """If "S" pressed on keyboard it will save all selected tiles in .json file"""
+        print("Clicked S(ave)")
+        saved_tiles = []
+        for tile in self.tiles.sprites():
+            # Append tiles pos to correct list if tile is occupied
+            if not tile.is_available:
+                tiles_attr = {"type": tile.tile_type, "pos": tile.rect.topleft}
+                saved_tiles.append(tiles_attr)
+            save_tiles(saved_tiles, lvl="02")
+            print(saved_tiles)
+            # Flash white screen when level is saved
+            self.surface.fill(s.WHITE)
+            pygame.display.flip()
+            print("Saved")
 
 
-saved_tiles = []
+def main():
+    LevelEditor().run()
 
-clock = pygame.time.Clock()
-running = True
-while running:
-    clock.tick(s.FRAME_RATE)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            for tile in tiles:
-                tile.clicked(event)
-        # If "S" pressed on keyboard it will save all selected tiles in .json file
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_s:
-                print("Clicked S(ave)")
-                for tile in tiles:
-                    # Append tiles pos to correct list if tile is occupied
-                    if not tile.available:
-                        tiles_attr = {"type": tile.type, "pos": tile.pos}
-                        saved_tiles.append(tiles_attr)
-                save_tiles(saved_tiles, lvl="01")
-                print(saved_tiles)
-                # Flash white screen when level is saved
-                screen.fill(s.WHITE)
-                pygame.display.flip()
-                print("Saved")
 
-    screen.fill(s.GRAY)
-    for tile in tiles:
-        tile.draw()
-    pygame.display.flip()
+if __name__ == '__main__':
+    main()
