@@ -1,16 +1,18 @@
 import pygame
-from scripts.game_objects.tiles import Tiles
+import settings as s
 
 
-class Tiles(Tiles):
+class Tiles(pygame.sprite.Sprite):
     PRESSED = "pressed"
     NORMAL = "normal"
 
     def __init__(self, pos):
+        super(Tiles, self).__init__()
         self.state = self.NORMAL
         self.tile_type = 0
         self.available = True
-        super().__init__(self.tile_type, pos)
+        self.image = self.get_test_image(self.tile_type)
+        self.rect = self.image.get_rect(topleft=pos)
 
     def handle_mouse_event(self, type, pos):
         if type == pygame.MOUSEMOTION:
@@ -47,6 +49,26 @@ class Tiles(Tiles):
         # Changing the availability on click (if available and clicked it changes to not available and vice versa)
         self.tile_type = (self.tile_type + 1) if self.tile_type < 3 else 0
         self.available = True if self.tile_type == 0 else False
+
+    @staticmethod
+    def get_test_image(type):
+        if type == 1:
+            color = s.GREEN
+        elif type == 2:
+            color = s.BLUE
+        elif type == 3:
+            color = s.RED
+        else:
+            color = s.WHITE
+        image = pygame.Surface((s.TILE_SIZE, s.TILE_SIZE))
+        image.fill(color)
+
+        if color == s.WHITE:
+            inner_color = pygame.Surface((s.TILE_SIZE, s.TILE_SIZE))
+            inner_color.fill(s.GRAY)
+            image.blit(inner_color, (1, 1))
+
+        return image
 
     def update(self):
         self.image = self.get_test_image(self.tile_type)

@@ -4,6 +4,7 @@ import settings as s
 from scripts.game_objects.background import BackGround
 from scripts.main_loop import MainLoop
 from scripts.level_editor_objects.tiles import Tiles
+import os
 
 
 def save_tiles(s_tiles: list, lvl: str):
@@ -11,7 +12,11 @@ def save_tiles(s_tiles: list, lvl: str):
 
     Level folder must exist before saving the tiles in selected folder
     """
-    json_file = open(f"../level{lvl}/tiles.json", "w")
+    dir_path = f"../level{lvl}"
+    if not os.path.isdir(dir_path):
+        os.mkdir(dir_path)
+    print(f"{dir_path}/tiles.json")
+    json_file = open(f"{dir_path}/tiles.json", "w")
     json.dump(s_tiles, json_file)
 
 
