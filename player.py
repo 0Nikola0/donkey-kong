@@ -1,6 +1,7 @@
 import pygame
 from graphics import SpriteSheet
 import json
+import settings as s
 
 
 # Need to replace platform with tiles, but i dont know if i can do the collisions correct -Nikola
@@ -11,20 +12,20 @@ class Platform:
         self.rect = pygame.Rect(self.posx, self.posy, self.sizex, self.sizey)
     
     def display(self):
-        pygame.draw.rect(screen, Green, self.rect)
+        pygame.draw.rect(screen, s.GREEN, self.rect)
 
 
 class Tiles:
     def __init__(self, tile_type, pos):
-        self.sizex, self.sizey = 50, 50
+        self.sizex, self.sizey = s.TILE_SIZE, s.TILE_SIZE
         self.posx, self.posy = pos
         self.type = tile_type
         self.rect = pygame.Rect(self.posx, self.posy, self.sizex, self.sizey)
 
     def display(self):
         # Draws empty green rect if available and blue filled if not
-        pygame.draw.rect(screen, Green if self.type == 1 else Blue if
-                         self.type == 2 else Red if self.type == 3 else White, self.rect)
+        pygame.draw.rect(screen, s.GREEN if self.type == 1 else s.BLUE if
+                         self.type == 2 else s.RED if self.type == 3 else s.WHITE, self.rect)
         # For when we add texture to the tiles
         """
         if not self.available:
@@ -37,7 +38,7 @@ class Tiles:
 class Player:
     def __init__(self):
         self.posx, self.posy = 400, 300
-        self.sizex, self.sizey = 40, 60
+        self.sizex, self.sizey = s.PLAYER_SIZE
         self.rect = pygame.Rect(self.posx, self.posy, self.sizex, self.sizey)
         self.vel = 10
         # The jumping code is from a tutorial i watched a while ago, idk if there's a better way to do it -Nikola
@@ -97,12 +98,7 @@ def level_loader(lvl):
     return l_tiles
 
 
-White = (255, 255, 255)
-Gray = (50, 50, 50)
-Red = (255, 0, 0)
-Green = (0, 255, 0)
-Blue = (0, 0, 255)
-screenWidth, screenHeight = 800, 600
+screenWidth, screenHeight = s.SCREEN_WIDTH, s.SCREEN_HEIGHT
 pygame.init()
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 clock = pygame.time.Clock()
@@ -112,7 +108,7 @@ tiles = []
 for tile in loaded_tiles:
     tiles.append(Tiles(tile["type"], tile["pos"]))
 
-Gravity = 15     # How fast the player falls (how fast is the player pulled to the ground)
+Gravity = s.GRAVITY     # How fast the player falls (how fast is the player pulled to the ground)
 platform = Platform()
 player = Player()
 
@@ -123,10 +119,10 @@ rock = sheet.get_image('rock', scale=(32, 31))
 
 running = True
 while running:
-    clock.tick(30)
+    clock.tick(s.FPS)
     # If no delay the game moves too fast
     pygame.time.delay(30)
-    screen.fill(Gray)
+    screen.fill(s.GRAY)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
