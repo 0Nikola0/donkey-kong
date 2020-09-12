@@ -51,14 +51,16 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, *args):
         """Move player if he jumped or have velocity"""
-        if self.current_vel > 0:
+        # TODO: Fix key_up, key_down functions. If player press both keys and then up one of them
+        #  self.current_vel will be == 0 (even player still hold the opposing move_key)
+        if self.current_vel > 0:  # move right case
             if self.rect.right + 5 < s.SCREEN_WIDTH:
                 self.rect.move_ip((self.current_vel, 0))
-        elif self.current_vel < 0:
+        elif self.current_vel < 0:  # move left case
             if self.rect.left - 5 > 0:
                 self.rect.move_ip((self.current_vel, 0))
 
-        if self.isJump:  # jump case
+        if self.isJump:  # jump case or jump + move case
             if self.jumpCount >= -self.jumpHeight:
                 jump_speed = (self.jumpCount * abs(self.jumpCount)) * 0.5
                 self.rect.move_ip((0, -jump_speed))
@@ -66,7 +68,10 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.isJump = False
                 self.jumpCount = self.jumpHeight
-        elif not self.isJump:  # gravity_case
+
+        elif not self.isJump:  # gravity case
+            if self.current_vel == 0:
+                self.image = self.image_idle
             if self.rect.bottom < self.platform.rect.top:
                 self.rect.move_ip((0, s.GRAVITY))
             # If the player glitches and his position is below the platform this puts him on top of it
