@@ -5,6 +5,7 @@ from scripts.graphics import SpriteSheet
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, keys, platform):
+        super(Player, self).__init__()
         self.posx, self.posy = x, y
         self.sizex, self.sizey = s.PLAYER_SIZE
 
