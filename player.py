@@ -103,7 +103,7 @@ pygame.init()
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 clock = pygame.time.Clock()
 
-loaded_tiles = level_loader("level01")
+loaded_tiles = s.level_loader(s.LEVEL01)
 tiles = []
 for tile in loaded_tiles:
     tiles.append(Tiles(tile["type"], tile["pos"]))
