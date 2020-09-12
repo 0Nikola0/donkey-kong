@@ -1,3 +1,5 @@
+import os
+
 import pygame
 import json
 
@@ -30,9 +32,14 @@ class Tiles:
 
 
 def save_tiles(s_tiles: list, lvl: str):
-    # Level folder must exist before saving the tiles in selected folder
-    # Saves the pos of the occupied type X tiles
-    json_file = open(f"level{lvl}/tiles.json", "w")
+    """Saves the pos of the occupied type X tiles
+
+    Level folder must exist before saving the tiles in selected folder
+    """
+    dir_path = f"../level{lvl}"
+    if not os.path.isdir(dir_path):
+        os.mkdir(dir_path)
+    json_file = open(f"{dir_path}/tiles.json", "w")
     json.dump(s_tiles, json_file)
 
 
