@@ -3,12 +3,16 @@ import settings as s
 from scripts.graphics import SpriteSheet
 
 
-class Player:
-    def __init__(self, x, y):
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y, keys, platform):
         self.posx, self.posy = x, y
         self.sizex, self.sizey = s.PLAYER_SIZE
-        self.rect = pygame.Rect(self.posx, self.posy, self.sizex, self.sizey)
+
+        self.platform = platform
+
         self.vel = 10
+        self.current_vel = 0
+
         # The jumping code is from a tutorial i watched a while ago, idk if there's a better way to do it -Nikola
         self.isJump = False
         self.jumpHeight = 10
@@ -16,45 +20,50 @@ class Player:
 
         # Load the sprites and set self to idle
         sheet = SpriteSheet()
-        self.image_idle = sheet.get_image('player_idle', scale=(self.sizex, self.sizey))
-        self.image_right = sheet.get_image('player_right', scale=(self.sizex, self.sizey))
+        self.image_idle = sheet.get_image('player_idle', scale=s.PLAYER_SIZE)
+        self.image_right = sheet.get_image('player_right', scale=s.PLAYER_SIZE)
         self.image_left = pygame.transform.flip(self.image_right, True, False)
-        self.image = self.image_idle
 
-    def move(self, pkeys):
-        # Updating the player position based on which button is pressed
-        if pkeys[pygame.K_a] and self.posx - 5 > 0:
-            self.posx -= self.vel
-            self.rect.topleft = (round(self.posx), round(self.posy))
+        self.image = self.image_idle
+        self.rect = self.image.get_rect(topleft=(self.posx, self.posy))
+
+        # Assign keys
+        self.k_move_left = keys['move_left']
+        self.k_move_right = keys['move_right']
+        self.k_jump = keys['jump']
+
+    def handle_key_down(self, key):
+        if key == self.k_move_left and self.posx - 5 > 0:
+            self.current_vel = -self.vel
             self.image = self.image_left
-        if pkeys[pygame.K_d] and self.posx + self.sizex + 5 < s.SCREEN_WIDTH:
-            self.posx += self.vel
-            self.rect.topleft = (round(self.posx), round(self.posy))
+        elif key == self.k_move_right and self.posx + self.sizex + 5 < s.SCREEN_WIDTH:
+            self.current_vel = self.vel
             self.image = self.image_right
-        # Space is only registered if you're not already in jump
-        if not self.isJump:
-            if pkeys[pygame.K_SPACE]:
-                self.isJump = True
-        if self.isJump:
+        elif key == self.k_jump and not self.isJump:
+            self.isJump = True
+
+    def handle_key_up(self, key):
+        if key == self.k_move_left:
+            self.current_vel = 0
+        elif key == self.k_move_right:
+            self.current_vel = 0
+
+    def update(self, *args):
+        """Move player if he jumped or have velocity"""
+        if self.current_vel != 0:  # move case
+            self.rect.move_ip((self.current_vel, 0))
+
+        if self.isJump:  # jump case
             if self.jumpCount >= -self.jumpHeight:
-                self.posy -= (self.jumpCount * abs(self.jumpCount)) * 0.5
-                # This is jump speed, i think (for some reason it breaks on 3 and you can double jump)
+                jump_speed = (self.jumpCount * abs(self.jumpCount)) * 0.5
+                self.rect.move_ip((0, -jump_speed))
                 self.jumpCount -= 1
             else:
                 self.isJump = False
                 self.jumpCount = self.jumpHeight
-            self.rect.topleft = (round(self.posx), round(self.posy))
-
-    def gravity(self, platform):
-        # Jumping feature already pulls the player down if in jump so this runs only if player is not in jump
-        if not self.isJump:
-            if self.posy + self.sizey < platform.posy:
-                self.posy += s.GRAVITY
+        elif not self.isJump:  # gravity_case
+            if self.rect.bottom < self.platform.rect.top:
+                self.rect.move_ip((0, s.GRAVITY))
             # If the player glitches and his position is below the platform this puts him on top of it
-            if self.posy + self.sizey > platform.posy:
-                self.posy = platform.posy - self.sizey
-            self.rect.topleft = (round(self.posx), round(self.posy))
-
-    def display(self, screen):
-        # pygame.draw.rect(screen, Blue, self.rect)
-        screen.blit(self.image, self.rect)
+            if self.rect.bottom > self.platform.rect.top:
+                self.rect.bottom = self.platform.rect.top
