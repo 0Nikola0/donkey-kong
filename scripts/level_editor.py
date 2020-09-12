@@ -58,7 +58,7 @@ saved_tiles = []
 clock = pygame.time.Clock()
 running = True
 while running:
-    clock.tick(s.FPS)
+    clock.tick(s.FRAME_RATE)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False

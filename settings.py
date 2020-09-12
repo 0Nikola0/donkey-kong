@@ -1,4 +1,7 @@
 import json
+import pygame
+
+
 # Colors
 WHITE = (255, 255, 255)
 GRAY = (50, 50, 50)
@@ -10,7 +13,7 @@ BLUE = (0, 0, 255)
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT) = 800, 600
 
 # FPS
-FPS = 30
+FRAME_RATE = 30
 
 # Sprites
 TILE_SIZE = 50
@@ -27,3 +30,9 @@ def level_loader(lvl):
     file = open(f"{lvl}/tiles.json")
     l_tiles = json.load(file)
     return l_tiles
+
+
+# Controllers
+K_PLAYER_MOVE_LEFT = pygame.K_a
+K_PLAYER_MOVE_RIGHT = pygame.K_d
+K_PLAYER_JUMP = pygame.K_SPACE
