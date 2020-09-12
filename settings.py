@@ -1,0 +1,19 @@
+# Colors
+WHITE = (255, 255, 255)
+GRAY = (50, 50, 50)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+
+# Screen size
+SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT) = 800, 600
+
+# FPS
+FPS = 30
+
+# Sprites
+TILE_SIZE = 50
+PLAYER_SIZE = (PLAYER_SIZE_X, PLAYER_SIZE_Y) = 40, 60
+
+# Physics
+GRAVITY = 15
