@@ -15,7 +15,6 @@ def save_tiles(s_tiles: list, lvl: str):
     dir_path = f"../level{lvl}"
     if not os.path.isdir(dir_path):
         os.mkdir(dir_path)
-    print(f"{dir_path}/tiles.json")
     json_file = open(f"{dir_path}/tiles.json", "w")
     json.dump(s_tiles, json_file)
 
@@ -60,12 +59,13 @@ class LevelEditor(MainLoop):
             if not tile.is_available:
                 tiles_attr = {"type": tile.tile_type, "pos": tile.rect.topleft}
                 saved_tiles.append(tiles_attr)
-            save_tiles(saved_tiles, lvl="02")
-            print(saved_tiles)
-            # Flash white screen when level is saved
-            self.surface.fill(s.WHITE)
-            pygame.display.flip()
-            print("Saved")
+        save_tiles(saved_tiles, lvl="02")
+        print(saved_tiles)
+        # Flash white screen when level is saved
+        self.surface.fill(s.WHITE)
+        pygame.display.flip()
+        pygame.time.wait(100)
+        print("Saved")
 
 
 def main():
