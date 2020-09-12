@@ -73,6 +73,10 @@ class MainLoop:
                 for handler in self.mouse_handlers:
                     handler(event.type, event.pos)
 
+    def add_up_down_key_handlers(self, obj, key):
+        self.keydown_handlers[key].append(obj.handle_key_down)
+        self.keyup_handlers[key].append(obj.handle_key_up)
+
     def run(self):
         while self.running:
 

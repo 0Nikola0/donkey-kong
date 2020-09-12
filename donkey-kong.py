@@ -81,10 +81,6 @@ class DonkeyKong(MainLoop):
         self.player.add(player)
         self.all_objects_groups.append(self.player)
 
-    def add_up_down_key_handlers(self, obj, key):
-        self.keydown_handlers[key].append(obj.handle_key_down)
-        self.keyup_handlers[key].append(obj.handle_key_up)
-
 
 def main():
     DonkeyKong().run()
