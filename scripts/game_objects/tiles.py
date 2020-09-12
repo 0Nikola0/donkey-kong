@@ -2,21 +2,22 @@ import pygame
 import settings as s
 
 
-class Tiles:
+class Tiles(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos):
-        self.sizex, self.sizey = s.TILE_SIZE, s.TILE_SIZE
-        self.posx, self.posy = pos
-        self.type = tile_type
-        self.rect = pygame.Rect(self.posx, self.posy, self.sizex, self.sizey)
+        super(Tiles, self).__init__()
+        self.image = self.__get_test_image(tile_type)
+        self.rect = self.image.get_rect(topleft=pos)
 
-    def display(self, screen):
-        # Draws empty green rect if available and blue filled if not
-        pygame.draw.rect(screen, s.GREEN if self.type == 1 else s.BLUE if
-                         self.type == 2 else s.RED if self.type == 3 else s.WHITE, self.rect)
-        # For when we add texture to the tiles
-        """
-        if not self.available:
-            screen.blit(tiles_img, self.pos)
+    @staticmethod
+    def __get_test_image(type):
+        if type == 1:
+            color = s.GREEN
+        elif type == 2:
+            color = s.BLUE
+        elif type == 3:
+            color = s.RED
         else:
-            pygame.draw.rect(screen, Green, self.rect, 1)
-        """
+            color = s.WHITE
+        image = pygame.Surface((s.TILE_SIZE, s.TILE_SIZE))
+        image.fill(color)
+        return image
