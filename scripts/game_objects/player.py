@@ -65,6 +65,8 @@ class Player(pygame.sprite.Sprite):
 
         if self.is_stand_on_tile is False:
             self.acc.y = s.PLAYER_GRAVITY
+        else:
+            self.vel.y = 0  # stop fall if player stand on the tile
 
         if self.is_move_left is True:
             self.acc.x = -s.PLAYER_ACCELERATION

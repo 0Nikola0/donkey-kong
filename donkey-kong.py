@@ -81,9 +81,11 @@ class DonkeyKong(MainLoop):
 
         hits = pygame.sprite.groupcollide(self.tiles, self.player, False, False)
         if hits:
-            for hit in hits:
-                self.player.sprite.rect.bottom = hit.rect.top
-                self.player.sprite.activate_gravity(False)
+            player = self.player.sprite
+            for tile in hits:
+                if tile.rect.top < player.rect.bottom:  # if tile behind the player / 1-side collision
+                    self.player.sprite.rect.bottom = tile.rect.top
+                    self.player.sprite.activate_gravity(False)
         else:
             self.player.sprite.activate_gravity(True)
 
