@@ -1,7 +1,6 @@
 import pygame
 
 from scripts.game_objects.background import BackGround
-from scripts.game_objects.platform import Platform
 from scripts.game_objects.player import Player
 from scripts.game_objects.test_object import TestObject
 from scripts.game_objects.tiles import Tiles
