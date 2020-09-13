@@ -15,6 +15,7 @@ class DonkeyKong(MainLoop):
         super(DonkeyKong, self).__init__("Donkey Kong", s.SCREEN_SIZE, s.FRAME_RATE)
 
         # self.sheet = SpriteSheet()
+        self.player_spawn = (400, 300)
 
         # Groups
         self.background = pygame.sprite.Group()
@@ -41,7 +42,6 @@ class DonkeyKong(MainLoop):
     def create_map(self):
         self.create_tiles()
         self.create_test_tiles()
-        self.create_platform()
 
     def create_tiles(self):
         loaded_tiles = s.level_loader(s.LEVEL01)
@@ -58,10 +58,6 @@ class DonkeyKong(MainLoop):
             ))
         self.all_objects_groups.append(self.__test_tiles)
 
-    def create_platform(self):
-        platform = Platform(0, s.SCREEN_HEIGHT - 20, s.SCREEN_WIDTH, 20)
-        self.platform.add(platform)
-
     def create_player(self):
         player_controllers = {
             'move_left': s.K_PLAYER_MOVE_LEFT,
@@ -70,16 +66,32 @@ class DonkeyKong(MainLoop):
         }
 
         player = Player(
-            400,
-            300,
+            self.player_spawn[0],
+            self.player_spawn[1],
             keys=player_controllers,
-            platform=self.platform.sprite,  # The player doesnt interact with the tiles yet, it does with the platform
         )
         for key in player_controllers.values():
             self.add_up_down_key_handlers(player, key)
 
         self.player.add(player)
         self.all_objects_groups.append(self.player)
+
+    def update(self):
+        super().update()
+
+        hits = pygame.sprite.groupcollide(self.tiles, self.player, False, False)
+        print(hits)
+        if hits:
+            for hit in hits:
+                print(self.player.sprite.rect.bottom, hit.rect.top)
+                self.player.sprite.rect.bottom = hit.rect.top
+                self.player.sprite.activate_gravity(False)
+        else:
+            self.player.sprite.activate_gravity(True)
+
+        if self.player.sprite.rect.bottom > s.SCREEN_HEIGHT:  # debug if player falls outer screen
+            self.player.sprite.rect.center = self.player_spawn
+            self.player.sprite.activate_gravity(True)
 
 
 def main():

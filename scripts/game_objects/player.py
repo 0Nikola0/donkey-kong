@@ -6,12 +6,10 @@ from scripts.graphics import SpriteSheet
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, keys, platform):
+    def __init__(self, x, y, keys):
         super(Player, self).__init__()
         self.posx, self.posy = x, y
         self.sizex, self.sizey = s.PLAYER_SIZE
-
-        self.platform = platform
 
         self.vel = Vector2(0, 0)
         self.acc = Vector2(0, 0)
@@ -20,6 +18,8 @@ class Player(pygame.sprite.Sprite):
         self.isJump = False
         self.jumpHeight = 10
         self.jumpCount = self.jumpHeight
+
+        self.is_stand_on_tile = False
 
         # Load the sprites and set self to idle
         sheet = SpriteSheet()
@@ -56,8 +56,16 @@ class Player(pygame.sprite.Sprite):
         if key == self.k_move_right:
             self.move_right = False
 
-    def movement_physics(self):
+    def activate_gravity(self, state: bool):
+        """On and off gravity/y-acceleration"""
+        self.is_stand_on_tile = not state
+
+    def physics(self):
         self.acc = Vector2(0, 0)
+
+        if self.is_stand_on_tile is False:
+            self.acc.y = s.PLAYER_GRAVITY
+
         if self.move_left is True:
             self.acc.x = -s.PLAYER_ACCELERATION
             self.change_image("image_left")
@@ -65,18 +73,19 @@ class Player(pygame.sprite.Sprite):
             self.acc.x = s.PLAYER_ACCELERATION
             self.change_image("image_right")
 
-        self.acc += self.vel * s.PLAYER_FRICTION
+        self.acc.x += self.vel.x * s.PLAYER_FRICTION
         self.vel += self.acc
 
     def update(self, *args):
         """Move player if he jumped or have velocity"""
-        self.movement_physics()
-        if self.vel.x > 0:
-            if self.rect.right + 5 < s.SCREEN_WIDTH:  # move right case
-                self.rect.move_ip((self.vel.x + (0.5 * self.acc.x), 0))
-        elif self.vel.x < 0:
-            if self.rect.left - 5 > 0:  # move left case
-                self.rect.move_ip((self.vel.x + (0.5 * self.acc.x), 0))
+        self.physics()
+        # if self.vel.x > 0:
+        #     if self.rect.right + 5 < s.SCREEN_WIDTH:  # move right case
+        #         self.rect.move_ip((self.vel.x + (0.5 * self.acc.x), self.vel.y))
+        # elif self.vel.x < 0:
+        #     if self.rect.left - 5 > 0:  # move left case
+        #         self.rect.move_ip((self.vel.x + (0.5 * self.acc.x), self.vel.y))
+        self.rect.move_ip((self.vel.x + (0.5 * self.acc.x), self.vel.y))
 
         if self.isJump:  # jump case or jump + move case
             if self.jumpCount >= -self.jumpHeight:
@@ -86,13 +95,6 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.isJump = False
                 self.jumpCount = self.jumpHeight
-
-        elif not self.isJump:  # gravity case
-            if self.rect.bottom < self.platform.rect.top:
-                self.rect.move_ip((0, s.GLOBAL_GRAVITY))
-            # If the player glitches and his position is below the platform this puts him on top of it
-            if self.rect.bottom > self.platform.rect.top:
-                self.rect.bottom = self.platform.rect.top
 
     def change_image(self, image_name):
         if image_name == "image_right":
