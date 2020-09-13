@@ -47,7 +47,7 @@ class MainMenuButton(object):
 
     def click(self, mouse_pos):
         if self.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-            print("Pressed: " + self.text)
+            print("Pressed: " + self.name)
             # Need to fix this later
             if self.text.upper() == "EXIT":
                 pygame.quit()  # added code to exit
@@ -61,10 +61,10 @@ def main():
     bpx = 670   # Button pos x
     bsx = 200   # Button size x
     bsy = 50
-    buttons = [MainMenuButton("Play", (bpx, 320), (bsx, bsy)),
-               MainMenuButton("Help", (bpx, 380), (bsx, bsy)),
-               MainMenuButton("About", (bpx, 440), (bsx, bsy)),
-               MainMenuButton("Exit", (bpx, 500), (bsx, bsy))]
+    buttons = [["Play", MainMenuButton("Play", (bpx, 320), (bsx, bsy))],
+               ["Help", MainMenuButton("Help", (bpx, 380), (bsx, bsy))],
+               ["About", MainMenuButton("About", (bpx, 440), (bsx, bsy))],
+               ["Exit", MainMenuButton("Exit", (bpx, 500), (bsx, bsy))]]
 
     running = True
     while running:
@@ -78,14 +78,14 @@ def main():
         pressed1, pressed2, pressed3 = pygame.mouse.get_pressed()
         if pressed1:
             for button in buttons:
-                button.click(mouse_pos)
+                button[1].click(mouse_pos)
 
         screen.blit(bg, (0, 0))
         screen.blit(title, (0, 0))
 
         for button in buttons:
-            button.update(mouse_pos)
-            button.display()
+            button[1].update(mouse_pos)
+            button[1].display()
 
         pygame.display.update()
 
