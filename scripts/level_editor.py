@@ -12,7 +12,7 @@ def save_tiles(s_tiles: list, lvl: str):
 
     Level folder must exist before saving the tiles in selected folder
     """
-    dir_path = f"../level{lvl}"
+    dir_path = f"../levels/level{lvl}"
     if not os.path.isdir(dir_path):
         os.mkdir(dir_path)
     json_file = open(f"{dir_path}/tiles.json", "w")
