@@ -94,8 +94,6 @@ class Player(pygame.sprite.Sprite):
             if self.rect.bottom > self.platform.rect.top:
                 self.rect.bottom = self.platform.rect.top
 
-        # self.physics()
-
     def change_image(self, image_name):
         if image_name == "image_right":
             self.image = self.image_right

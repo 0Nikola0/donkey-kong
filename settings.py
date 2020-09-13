@@ -28,7 +28,7 @@ GLOBAL_GRAVITY = 15
 PLAYER_SIZE = (PLAYER_SIZE_X, PLAYER_SIZE_Y) = 40, 60
 PLAYER_ACCELERATION = 0.8
 PLAYER_FRICTION = -0.07
-PLAYER_VELOCITY = 10
+# player max velocity.x ~=~ 11
 PLAYER_GRAVITY = GLOBAL_GRAVITY  # How fast the player falls (how fast is the player pulled to the ground)
 
 # levels
