@@ -37,7 +37,7 @@ LEVEL01 = "level01"
 
 
 def level_loader(lvl):
-    file = open(f"{lvl}/tiles.json")
+    file = open(f"levels/{lvl}/tiles.json")
     l_tiles = json.load(file)
     return l_tiles
 
