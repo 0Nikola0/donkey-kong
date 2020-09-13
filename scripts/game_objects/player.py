@@ -1,4 +1,6 @@
 import pygame
+from pygame.math import Vector2
+
 import settings as s
 from scripts.graphics import SpriteSheet
 
@@ -11,8 +13,8 @@ class Player(pygame.sprite.Sprite):
 
         self.platform = platform
 
-        self.vel = 10
-        self.current_vel = 0
+        self.vel = Vector2(0, 0)
+        self.acc = Vector2(0, 0)
 
         # The jumping code is from a tutorial i watched a while ago, idk if there's a better way to do it -Nikola
         self.isJump = False
@@ -33,32 +35,48 @@ class Player(pygame.sprite.Sprite):
         self.k_move_right = keys['move_right']
         self.k_jump = keys['jump']
 
+        self.acc_down = False
+        self.move_left = False
+        self.move_right = False
+
     def handle_key_down(self, key):
         if key == self.k_move_left:
-            self.current_vel = -self.vel
+            self.move_left = True
             self.image = self.image_left
-        elif key == self.k_move_right:
-            self.current_vel = self.vel
+        if key == self.k_move_right:
+            self.move_right = True
             self.image = self.image_right
         elif key == self.k_jump and not self.isJump:
             self.isJump = True
 
     def handle_key_up(self, key):
         if key == self.k_move_left:
-            self.current_vel = 0
-        elif key == self.k_move_right:
-            self.current_vel = 0
+            self.move_left = False
+
+        if key == self.k_move_right:
+            self.move_right = False
+
+    def movement_physics(self):
+        self.acc = Vector2(0, 0)
+        if self.move_left is True:
+            self.acc.x = -s.PLAYER_ACCELERATION
+            self.change_image("image_left")
+        if self.move_right is True:
+            self.acc.x = s.PLAYER_ACCELERATION
+            self.change_image("image_right")
+
+        self.acc += self.vel * s.PLAYER_FRICTION
+        self.vel += self.acc
 
     def update(self, *args):
         """Move player if he jumped or have velocity"""
-        # TODO: Fix key_up, key_down functions. If player press both keys and then up one of them
-        #  self.current_vel will be == 0 (even player still hold the opposing move_key)
-        if self.current_vel > 0:  # move right case
-            if self.rect.right + 5 < s.SCREEN_WIDTH:
-                self.rect.move_ip((self.current_vel, 0))
-        elif self.current_vel < 0:  # move left case
-            if self.rect.left - 5 > 0:
-                self.rect.move_ip((self.current_vel, 0))
+        self.movement_physics()
+        if self.vel.x > 0:
+            if self.rect.right + 5 < s.SCREEN_WIDTH:  # move right case
+                self.rect.move_ip((self.vel.x + (0.5 * self.acc.x), 0))
+        elif self.vel.x < 0:
+            if self.rect.left - 5 > 0:  # move left case
+                self.rect.move_ip((self.vel.x + (0.5 * self.acc.x), 0))
 
         if self.isJump:  # jump case or jump + move case
             if self.jumpCount >= -self.jumpHeight:
@@ -70,10 +88,18 @@ class Player(pygame.sprite.Sprite):
                 self.jumpCount = self.jumpHeight
 
         elif not self.isJump:  # gravity case
-            if self.current_vel == 0:
-                self.image = self.image_idle
             if self.rect.bottom < self.platform.rect.top:
-                self.rect.move_ip((0, s.GRAVITY))
+                self.rect.move_ip((0, s.GLOBAL_GRAVITY))
             # If the player glitches and his position is below the platform this puts him on top of it
             if self.rect.bottom > self.platform.rect.top:
                 self.rect.bottom = self.platform.rect.top
+
+        # self.physics()
+
+    def change_image(self, image_name):
+        if image_name == "image_right":
+            self.image = self.image_right
+        elif image_name == "image_left":
+            self.image = self.image_left
+        elif image_name == "image_idle":
+            self.image = self.image_idle
