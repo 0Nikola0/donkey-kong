@@ -22,7 +22,7 @@ NUM_TILES_IN_ROW = SCREEN_WIDTH // TILE_SIZE
 NUM_TILES_IN_COLUMN = SCREEN_HEIGHT // TILE_SIZE
 
 # Physics
-GLOBAL_GRAVITY = 5
+GLOBAL_GRAVITY = 0.8
 
 # Player properties
 PLAYER_SIZE = (PLAYER_SIZE_X, PLAYER_SIZE_Y) = 40, 60
@@ -30,6 +30,7 @@ PLAYER_ACCELERATION = 0.8
 PLAYER_FRICTION = -0.07
 # player max velocity.x ~=~ 11
 PLAYER_GRAVITY = GLOBAL_GRAVITY  # How fast the player falls (how fast is the player pulled to the ground)
+PLAYER_JUMP_HEIGHT = 20
 
 # levels
 LEVEL01 = "level01"
