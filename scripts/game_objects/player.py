@@ -6,7 +6,7 @@ from scripts.graphics import SpriteSheet
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, keys):
+    def __init__(self, x, y, /, keys, is_stand_on_tile=False):
         super(Player, self).__init__()
         self.posx, self.posy = x, y
         self.sizex, self.sizey = s.PLAYER_SIZE
@@ -19,7 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.jumpHeight = 10
         self.jumpCount = self.jumpHeight
 
-        self.is_stand_on_tile = False
+        self.is_stand = is_stand_on_tile
 
         self.is_move_left = False
         self.is_move_right = False
@@ -58,12 +58,12 @@ class Player(pygame.sprite.Sprite):
 
     def activate_gravity(self, state: bool):
         """On and off gravity/y-acceleration"""
-        self.is_stand_on_tile = not state
+        self.is_stand = not state
 
     def physics(self):
         self.acc = Vector2(0, 0)
 
-        if self.is_stand_on_tile is False:
+        if self.is_stand is False:
             self.acc.y = s.PLAYER_GRAVITY
         else:
             self.vel.y = 1  # It will entail collision and remain is_stand_on_tile in True state.
@@ -75,7 +75,7 @@ class Player(pygame.sprite.Sprite):
             self.acc.x = s.PLAYER_ACCELERATION
             self.change_image("image_right")
 
-        if self.is_jump and self.is_stand_on_tile:
+        if self.is_jump and self.is_stand:
             self.jump()
         else:
             self.is_jump = False

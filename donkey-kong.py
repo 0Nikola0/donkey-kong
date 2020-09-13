@@ -68,6 +68,7 @@ class DonkeyKong(MainLoop):
             self.player_spawn[0],
             self.player_spawn[1],
             keys=player_controllers,
+            is_stand_on_tile=False,
         )
         for key in player_controllers.values():
             self.add_up_down_key_handlers(player, key)
@@ -89,7 +90,7 @@ class DonkeyKong(MainLoop):
             self.player.sprite.activate_gravity(True)
 
         if self.player.sprite.rect.bottom > s.SCREEN_HEIGHT:  # debug if player falls outer screen
-            self.player.sprite.rect.center = self.player_spawn
+            self.player.sprite.rect.topleft = self.player_spawn
             self.player.sprite.activate_gravity(True)
 
 
