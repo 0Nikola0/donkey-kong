@@ -56,6 +56,12 @@ class Player(pygame.sprite.Sprite):
         self.is_stand = not state
 
     def physics(self):
+        """Calculates player velocity and acceleration
+
+        If you want the Player to speed up or slow down then change these constants:
+        PLAYER_ACCELERATION and PLAYER_FRICTION for player speed
+        PLAYER_JUMP_HEIGHT for jump height
+        """
         self.acc = Vector2(0, 0)
 
         if self.is_stand is False:
@@ -81,10 +87,18 @@ class Player(pygame.sprite.Sprite):
     def jump(self):
         self.vel.y = -s.PLAYER_JUMP_HEIGHT
 
-    def update(self, *args):
-        self.physics()
+    def move_player(self):
+        x_offset = self.vel.x + (0.5 * self.acc.x)  # kinematics formula
+        y_offset = self.vel.y
+        self.rect.move_ip((x_offset, y_offset))
 
-        self.rect.move_ip((self.vel.x + (0.5 * self.acc.x), self.vel.y))  # in x - kinematics formula
+    def update(self, *args):
+        """Change player state
+
+        This method will be called every iteration of gameloop
+        """
+        self.physics()
+        self.move_player()
 
     def change_image(self, image_name):
         if image_name == "image_right":
