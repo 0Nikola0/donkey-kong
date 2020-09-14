@@ -14,11 +14,6 @@ class Player(pygame.sprite.Sprite):
         self.vel = Vector2(0, 0)
         self.acc = Vector2(0, 0)
 
-        # The jumping code is from a tutorial i watched a while ago, idk if there's a better way to do it -Nikola
-        self.isJump = False
-        self.jumpHeight = 10
-        self.jumpCount = self.jumpHeight
-
         self.is_stand = is_stand_on_tile
 
         self.is_move_left = False
@@ -87,7 +82,6 @@ class Player(pygame.sprite.Sprite):
         self.vel.y = -s.PLAYER_JUMP_HEIGHT
 
     def update(self, *args):
-        """Move player if he jumped or have velocity"""
         self.physics()
 
         self.rect.move_ip((self.vel.x + (0.5 * self.acc.x), self.vel.y))  # in x - kinematics formula
