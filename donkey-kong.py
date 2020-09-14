@@ -4,9 +4,8 @@ from scripts.game_objects.background import BackGround
 from scripts.game_objects.player import Player
 from scripts.game_objects.test_object import TestObject
 from scripts.game_objects.tiles import Tiles
-from scripts.graphics import SpriteSheet
 from scripts.main_loop import MainLoop
-import settings as s
+from scripts import settings as s
 
 
 class DonkeyKong(MainLoop):

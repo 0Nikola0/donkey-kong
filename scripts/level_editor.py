@@ -1,6 +1,6 @@
 import pygame
 import json
-import settings as s
+from scripts import settings as s
 from scripts.game_objects.background import BackGround
 from scripts.main_loop import MainLoop
 from scripts.level_editor_objects.tiles import Tiles

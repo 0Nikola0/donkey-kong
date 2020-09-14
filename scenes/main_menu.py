@@ -1,5 +1,5 @@
 import pygame
-import settings as s
+from scripts import settings as s
 
 pygame.init()
 

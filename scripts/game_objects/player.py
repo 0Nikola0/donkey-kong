@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import Vector2
 
-import settings as s
+from scripts import settings as s
 from scripts.graphics import SpriteSheet
 
 
