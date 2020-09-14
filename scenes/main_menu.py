@@ -3,14 +3,15 @@ import settings as s
 
 pygame.init()
 
-IMGS_PATH = "../resources/images/"
+IMGS_PATH = "../resources/images/menu_stuff/"
+FONTS_PATH = "../resources/fonts/"
 icon = pygame.image.load(IMGS_PATH + "icon.jpg")
 icon = pygame.transform.scale(icon, (70, 70))
 screen = pygame.display.set_mode(s.SCREEN_SIZE)
 pygame.display.set_icon(icon)
 pygame.display.set_caption("Donkey Kong Game")
 
-Font = pygame.font.Font(IMGS_PATH + "Aldrich-Regular.ttf", 30)
+Font = pygame.font.Font(FONTS_PATH + "Aldrich-Regular.ttf", 30)
 bg = pygame.image.load(IMGS_PATH + "bg.jpg")
 bg = pygame.transform.scale(bg, (800, 600))
 title = pygame.image.load(IMGS_PATH + "title.jpg")

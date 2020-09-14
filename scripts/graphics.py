@@ -6,7 +6,7 @@ usage:
 
 import pygame
 
-file_name = "resources/images/monkeylad_further.png"
+file_name = "resources/images/sprites/monkeylad_further.png"
 
 NAME = {
     'player_idle':  (448, 208, 16, 24),
