@@ -1,6 +1,7 @@
 import pygame
 
 from scripts.game_objects.background import BackGround
+from scripts.game_objects.enemy import TestEnemy
 from scripts.game_objects.player import Player
 from scripts.game_objects.test_object import TestObject
 from scripts.game_objects.tiles import Tiles
@@ -21,6 +22,7 @@ class DonkeyKong(MainLoop):
         self.platform = pygame.sprite.GroupSingle()
         self.tiles = pygame.sprite.Group()
         self.__test_tiles = pygame.sprite.Group()
+        self.enemies = pygame.sprite.Group()
 
         self.create_objects()
 
@@ -28,6 +30,7 @@ class DonkeyKong(MainLoop):
         self.create_background()
         self.create_map()
         self.create_player()
+        self.create_enemies()
 
     def create_background(self):
         self.background.add(BackGround(
@@ -55,6 +58,10 @@ class DonkeyKong(MainLoop):
                 'rock'
             ))
         self.all_objects_groups.append(self.__test_tiles)
+
+    def create_enemies(self):
+        self.enemies.add(TestEnemy(100, 50))
+        self.all_objects_groups.append(self.enemies)
 
     def create_player(self):
         player_controllers = {
