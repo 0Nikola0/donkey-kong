@@ -74,7 +74,6 @@ class DonkeyKong(MainLoop):
             self.player_spawn[0],
             self.player_spawn[1],
             keys=player_controllers,
-            is_stand_on_tile=False,
         )
         for key in player_controllers.values():
             self.add_up_down_key_handlers(player, key)
@@ -124,21 +123,18 @@ class DonkeyKong(MainLoop):
                     player.rect.left = left_tile.rect.right
                     player.stop_left_moving()
 
-            if player.is_falling():  # if player is falling
+            if player.is_falling():
                 if lowest_tile.rect.top < player.rect.bottom:
                     player.rect.bottom = lowest_tile.rect.top
-                    player.activate_gravity(False)
+                    player.deactivate_gravity()
             elif player.is_jumping():  # player is jumping (going upwards to the screen)
                 if highest_tile.rect.bottom < player.rect.bottom:
                     player.rect.top = highest_tile.rect.bottom
                     player.stop_jumping()
 
-        else:  # if the player doesn't hit a tile, then he is falling
-            self.player.sprite.activate_gravity(True)
-
         if self.player.sprite.rect.bottom > s.SCREEN_HEIGHT:  # debug if player falls outer screen
             self.player.sprite.rect.topleft = self.player_spawn
-            self.player.sprite.activate_gravity(True)
+            self.player.sprite.deactivate_gravity()
 
 
 def main():
