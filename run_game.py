@@ -85,14 +85,55 @@ class DonkeyKong(MainLoop):
     def update(self):
         super().update()
 
+        self.player_tile_collisions()
+
+    def player_tile_collisions(self):
+        """Change player physics if he collides with a tile
+
+        Because of multiple collisions, we need to find the lowest
+        tile (for top-collision), highest tile (for bot-collision)
+
+        Top and bottom collisions cannot occur at the same time
+        and
+        Left and right collisions cannot occur at the same time
+        but
+        Top or bottom collision can occur simultaneously with the left or right
+        """
         hits = pygame.sprite.groupcollide(self.tiles, self.player, False, False)
         if hits:
             player = self.player.sprite
+            lowest_tile = highest_tile = left_tile = right_tile = list(hits)[0]
             for tile in hits:
-                if tile.rect.top < player.rect.bottom:  # if tile behind the player / 1-side collision
-                    self.player.sprite.rect.bottom = tile.rect.top
-                    self.player.sprite.activate_gravity(False)
-        else:
+                if lowest_tile.rect.y < tile.rect.y:
+                    lowest_tile = tile
+                if highest_tile.rect.y > tile.rect.y:
+                    highest_tile = tile
+            for tile in hits:
+                if left_tile.rect.x >= tile.rect.x and tile.rect.y not in (lowest_tile.rect.y, highest_tile.rect.y):
+                    left_tile = tile
+                if right_tile.rect.x <= tile.rect.x and tile.rect.y not in (lowest_tile.rect.y, highest_tile.rect.y):
+                    right_tile = tile
+
+            # Affect player physics if collision
+            if player.is_move_right() and right_tile.rect.y not in (lowest_tile.rect.y, highest_tile.rect.y):
+                if right_tile.rect.left < player.rect.right:
+                    player.rect.right = right_tile.rect.left
+                    player.stop_right_moving()
+            elif player.is_move_left() and left_tile.rect.y not in (lowest_tile.rect.y, highest_tile.rect.y):
+                if left_tile.rect.left < player.rect.right:
+                    player.rect.left = left_tile.rect.right
+                    player.stop_left_moving()
+
+            if player.is_falling():  # if player is falling
+                if lowest_tile.rect.top < player.rect.bottom:
+                    player.rect.bottom = lowest_tile.rect.top
+                    player.activate_gravity(False)
+            elif player.is_jumping():  # player is jumping (going upwards to the screen)
+                if highest_tile.rect.bottom < player.rect.bottom:
+                    player.rect.top = highest_tile.rect.bottom
+                    player.stop_jumping()
+
+        else:  # if the player doesn't hit a tile, then he is falling
             self.player.sprite.activate_gravity(True)
 
         if self.player.sprite.rect.bottom > s.SCREEN_HEIGHT:  # debug if player falls outer screen

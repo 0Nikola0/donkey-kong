@@ -16,9 +16,9 @@ class Player(pygame.sprite.Sprite):
 
         self.is_stand = is_stand_on_tile
 
-        self.is_move_left = False
-        self.is_move_right = False
-        self.is_jump = False
+        self.move_left = False
+        self.move_right = False
+        self.jumping = False
 
         # Assign keys
         self.k_move_left = keys['move_left']
@@ -36,24 +36,50 @@ class Player(pygame.sprite.Sprite):
 
     def handle_key_down(self, key):
         if key == self.k_move_left:
-            self.is_move_left = True
+            self.move_left = True
             self.image = self.image_left
         if key == self.k_move_right:
-            self.is_move_right = True
+            self.move_right = True
             self.image = self.image_right
         elif key == self.k_jump:
-            self.is_jump = True
+            self.jumping = True
 
     def handle_key_up(self, key):
         if key == self.k_move_left:
-            self.is_move_left = False
+            self.move_left = False
 
         if key == self.k_move_right:
-            self.is_move_right = False
+            self.move_right = False
 
     def activate_gravity(self, state: bool):
         """On and off gravity/y-acceleration"""
         self.is_stand = not state
+
+    def is_falling(self):
+        return self.vel.y > 0
+
+    def is_jumping(self):
+        return self.vel.y < 0
+
+    def is_move_right(self):
+        return self.vel.x > 0.5
+
+    def is_move_left(self):
+        return self.vel.x < -0.5
+
+    def stop_jumping(self):
+        self.vel.y = 0.5
+
+    def stop_right_moving(self):
+        self.vel.x = 0
+        self.acc.x = 0
+
+    def stop_left_moving(self):
+        self.vel.x = 0
+        self.acc.x = 0
+
+    def jump(self):
+        self.vel.y = -s.PLAYER_JUMP_HEIGHT
 
     def physics(self):
         """Calculates player velocity and acceleration
@@ -69,23 +95,20 @@ class Player(pygame.sprite.Sprite):
         else:
             self.vel.y = 1  # It will entail collision and remain is_stand_on_tile in True state.
 
-        if self.is_move_left is True:
+        if self.move_left is True:
             self.acc.x = -s.PLAYER_ACCELERATION
             self.change_image("image_left")
-        if self.is_move_right is True:
+        if self.move_right is True:
             self.acc.x = s.PLAYER_ACCELERATION
             self.change_image("image_right")
 
-        if self.is_jump and self.is_stand:
+        if self.jumping and self.is_stand:
             self.jump()
         else:
-            self.is_jump = False
+            self.jumping = False
 
         self.acc.x += self.vel.x * s.PLAYER_FRICTION
         self.vel += self.acc
-
-    def jump(self):
-        self.vel.y = -s.PLAYER_JUMP_HEIGHT
 
     def move_player(self):
         x_offset = self.vel.x + (0.5 * self.acc.x)  # kinematics formula
