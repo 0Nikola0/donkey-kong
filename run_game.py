@@ -116,11 +116,11 @@ class DonkeyKong(MainLoop):
             # Affect player physics if collision
             if player.is_move_right() and right_tile.rect.y not in (lowest_tile.rect.y, highest_tile.rect.y):
                 if right_tile.rect.left < player.rect.right:
-                    player.rect.right = right_tile.rect.left
+                    player.rect.right = right_tile.rect.left  # TODO: if this player 103-105 don't add acc
                     player.stop_right_moving()
             elif player.is_move_left() and left_tile.rect.y not in (lowest_tile.rect.y, highest_tile.rect.y):
                 if left_tile.rect.left < player.rect.right:
-                    player.rect.left = left_tile.rect.right
+                    player.rect.left = left_tile.rect.right  # TODO: if this player 100-103 don't add acc
                     player.stop_left_moving()
 
             if player.is_falling():

@@ -94,7 +94,7 @@ class Player(pygame.sprite.Sprite):
 
         if self.is_stand is False:
             self.acc.y = s.PLAYER_GRAVITY
-        else:
+        elif self.is_stand is True:
             self.vel.y = 1  # It will entail collision and remain is_stand_on_tile in True state.
 
         if self.move_left_k_pressed is True:
