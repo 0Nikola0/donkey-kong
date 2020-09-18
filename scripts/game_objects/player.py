@@ -123,7 +123,8 @@ class Player(pygame.sprite.Sprite):
 
     def move_player(self):
         # If we have force to apply to the player (from hitting the arrow keys), apply it. (left-right)
-        self.body.apply_force_at_local_point(self.force, (0, 0))
+        if s.PLAYER_MAX_VELOCITY >= self.body.velocity.x >= -s.PLAYER_MAX_VELOCITY:
+            self.body.apply_force_at_local_point(self.force, (0, 0))
 
         if self.jumping:
             self.body.apply_impulse_at_local_point((0, s.PLAYER_JUMP_IMPULSE))
