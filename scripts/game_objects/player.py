@@ -25,12 +25,12 @@ class Player(pygame.sprite.Sprite):
 
         self.force = (0, 0)  # Current force applied to the player for movement by keyboard
 
-        self.is_stand = False
+        self.jumping = False
 
         # self.direction = 0  # 0 = idle; -1 = moving left: 1 = moving right
-        self.is_move_left = False
-        self.is_move_right = False
-        self.is_jump = False
+        self.move_left_k_pressed = False
+        self.move_right_k_pressed = False
+        self.jumping_k_pressed = False
 
         # Assign keys
         self.k_move_left = keys['move_left']
@@ -74,38 +74,65 @@ class Player(pygame.sprite.Sprite):
 
     def handle_key_down(self, key):
         if key == self.k_move_left:
-            # Add force to the player, and set the player friction to basic one
-            self.force = (-s.PLAYER_MOVE_FORCE, 0)
-            self.shape.friction = self.friction
-            self.image = self.image_left
-        if key == self.k_move_right:
-            # Add force to the player, and set the player friction to basic one
-            self.force = (s.PLAYER_MOVE_FORCE, 0)
-            self.shape.friction = self.friction
-            self.image = self.image_right
+            self.move_left_k_pressed = True
+            self.change_image("image_left")
+        elif key == self.k_move_right:
+            self.move_right_k_pressed = True
+            self.change_image("image_right")
         elif key == self.k_jump:
             # find out if player is standing on ground
-            grounding = self.check_grounding()
-            if grounding['body'] is not None and abs(
-                    grounding['normal'].x / grounding['normal'].y) < self.shape.friction:
-                self.body.apply_impulse_at_local_point((0, s.PLAYER_JUMP_IMPULSE))
+            self.jumping_k_pressed = True
 
     def handle_key_up(self, key):
         if key == self.k_move_left:
             # Remove force from the player, and set the player friction to a high number so he stops
             self.force = (0, 0)
             self.shape.friction = 1
+            self.move_left_k_pressed = False
 
-        if key == self.k_move_right:
+        elif key == self.k_move_right:
             # Remove force from the player, and set the player friction to a high number so he stops
             self.force = (0, 0)
             self.shape.friction = 1
+            self.move_right_k_pressed = False
 
-    def update(self, *args):
-        self.rect.center = s.flip_y(self.body.position)  # synchronizes player rect with pymunk player shape
+    def physics(self):
+        self.force = (0, 0)  # Current force applied to the player for movement by keyboard
 
+        if self.move_left_k_pressed is True:
+            # Add force to the player, and set the player friction to basic one
+            self.force = (-s.PLAYER_MOVE_FORCE, 0)
+            self.shape.friction = self.friction
+        if self.move_right_k_pressed is True:
+            # Add force to the player, and set the player friction to basic one
+            self.force = (s.PLAYER_MOVE_FORCE, 0)
+            self.shape.friction = self.friction
+
+        if (False, False) in (self.move_left_k_pressed, self.move_right_k_pressed):  # if player isn't moving
+            self.shape.friction = 1
+
+        if self.jumping_k_pressed:
+            grounding = self.check_grounding()
+            if grounding['body'] is not None and abs(
+                    grounding['normal'].x / grounding['normal'].y) < self.shape.friction:
+                self.jumping = True
+            self.jumping_k_pressed = False
+
+        # self.force.x += self.body.velocity.x * self.friction
+        # self.body.velocity += self.force
+
+    def move_player(self):
         # If we have force to apply to the player (from hitting the arrow keys), apply it. (left-right)
         self.body.apply_force_at_local_point(self.force, (0, 0))
+
+        if self.jumping:
+            self.body.apply_impulse_at_local_point((0, s.PLAYER_JUMP_IMPULSE))
+            self.jumping = False
+
+    def update(self, *args):
+        self.physics()
+        self.move_player()
+        self.rect.center = s.flip_y(self.body.position)  # synchronizes player rect with pymunk player shape
 
     def change_image(self, image_name):
         if image_name == "image_right":
