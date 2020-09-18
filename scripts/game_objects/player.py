@@ -133,7 +133,7 @@ class Player(pygame.sprite.Sprite):
     def update(self, *args):
         self.physics()
         self.move_player()
-        self.rect.center = s.flip_y(self.body.position)  # synchronizes player rect with pymunk player shape
+        self.rect.center = s.flip_y(self.body.position - (0, s.PLAYER_SHAPE_RADIUS))  # synchronizes player rect with pymunk player shape
 
     def change_image(self, image_name):
         if image_name == "image_right":
