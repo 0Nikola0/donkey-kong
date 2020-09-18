@@ -1,4 +1,6 @@
 import pygame
+import pymunk
+from pymunk import pygame_util
 from collections import defaultdict
 
 
@@ -9,7 +11,7 @@ class MainLoop:
     handle events, update game status, and draw sprites to screen_surface.
 
     """
-    def __init__(self, caption, screen_size, frame_rate):
+    def __init__(self, caption, screen_size, frame_rate, gravity):
         # display-window top left corner always will be open in this coordinates (x=600; y=40)
         # os.environ['SDL_VIDEO_WINDOW_POS'] = f"{600},{40}"
 
@@ -27,6 +29,14 @@ class MainLoop:
         self.keydown_handlers = defaultdict(list)
         self.keyup_handlers = defaultdict(list)
         self.mouse_handlers = []
+
+        # Gravity
+        self.space = pymunk.Space()
+        self.space.gravity = gravity
+
+        # Pymunk test draw
+        self.draw_options = pymunk.pygame_util.DrawOptions(self.surface)
+        self.is_test_mode = False
 
     def update(self):
         """Update game state
@@ -84,5 +94,9 @@ class MainLoop:
             self.update()
             self.draw()
 
+            if self.is_test_mode is True:
+                self.space.debug_draw(self.draw_options)
+
             pygame.display.update()
             self.clock.tick(self.frame_rate)
+            self.space.step(1/self.frame_rate)

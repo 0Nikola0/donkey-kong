@@ -2,6 +2,7 @@ import pygame
 
 from scripts.game_objects.background import BackGround
 from scripts.game_objects.enemy import TestEnemy
+from scripts.game_objects.level_borders import LevelBorders
 from scripts.game_objects.player import Player
 from scripts.game_objects.test_object import TestObject
 from scripts.game_objects.tiles import Tiles
@@ -11,7 +12,7 @@ from scripts import settings as s
 
 class DonkeyKong(MainLoop):
     def __init__(self):
-        super(DonkeyKong, self).__init__("Donkey Kong", s.SCREEN_SIZE, s.FRAME_RATE)
+        super(DonkeyKong, self).__init__("Donkey Kong", s.SCREEN_SIZE, s.FRAME_RATE, s.GRAVITY)
 
         # self.sheet = SpriteSheet()
         self.player_spawn = (400, 300)
@@ -27,10 +28,14 @@ class DonkeyKong(MainLoop):
         self.create_objects()
 
     def create_objects(self):
+        self.create_level_borders()
         self.create_background()
         self.create_map()
         self.create_player()
         self.create_enemies()
+
+    def create_level_borders(self):
+        LevelBorders(self.space, *self.surface.get_size())
 
     def create_background(self):
         self.background.add(BackGround(
@@ -47,7 +52,7 @@ class DonkeyKong(MainLoop):
     def create_tiles(self):
         loaded_tiles = s.level_loader(s.LEVEL01)
         for tile in loaded_tiles:
-            self.tiles.add(Tiles(tile["type"], tile["pos"]))
+            self.tiles.add(Tiles(tile["type"], tile["pos"], self.space))
         self.all_objects_groups.append(self.tiles)
 
     def create_test_tiles(self):
@@ -73,8 +78,8 @@ class DonkeyKong(MainLoop):
         player = Player(
             self.player_spawn[0],
             self.player_spawn[1],
+            self.space,
             keys=player_controllers,
-            is_stand_on_tile=False,
         )
         for key in player_controllers.values():
             self.add_up_down_key_handlers(player, key)
@@ -84,20 +89,6 @@ class DonkeyKong(MainLoop):
 
     def update(self):
         super().update()
-
-        hits = pygame.sprite.groupcollide(self.tiles, self.player, False, False)
-        if hits:
-            player = self.player.sprite
-            for tile in hits:
-                if tile.rect.top < player.rect.bottom:  # if tile behind the player / 1-side collision
-                    self.player.sprite.rect.bottom = tile.rect.top
-                    self.player.sprite.activate_gravity(False)
-        else:
-            self.player.sprite.activate_gravity(True)
-
-        if self.player.sprite.rect.bottom > s.SCREEN_HEIGHT:  # debug if player falls outer screen
-            self.player.sprite.rect.topleft = self.player_spawn
-            self.player.sprite.activate_gravity(True)
 
 
 def main():

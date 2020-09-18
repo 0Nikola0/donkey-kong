@@ -1,4 +1,5 @@
 import pygame
+import pymunk
 from pygame.math import Vector2
 
 from scripts import settings as s
@@ -6,16 +7,27 @@ from scripts.graphics import SpriteSheet
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, /, keys, is_stand_on_tile=False):
+    def __init__(self, x, y, space, /, keys):
+        # physics stuff
+        self.body = pymunk.Body(mass=1, moment=pymunk.inf, body_type=pymunk.Body.DYNAMIC)
+        pm_x, pm_y = x, s.flip_y(y)
+        self.body.position = pm_x + s.PLAYER_SIZE_X // 2, pm_y - s.PLAYER_SIZE_Y // 2  # body.position == rect.center
+        self.shape = pymunk.Poly.create_box(self.body, s.PLAYER_SIZE)
+        self.shape.elasticity = 1
+        self.friction = s.PLAYER_FRICTION
+        self.shape.friction = self.friction
+        space.add(self.body, self.shape)
+
+        # pygame stuff
         super(Player, self).__init__()
         self.posx, self.posy = x, y
         self.sizex, self.sizey = s.PLAYER_SIZE
 
-        self.vel = Vector2(0, 0)
-        self.acc = Vector2(0, 0)
+        self.force = (0, 0)  # Current force applied to the player for movement by keyboard
 
-        self.is_stand = is_stand_on_tile
+        self.is_stand = False
 
+        # self.direction = 0  # 0 = idle; -1 = moving left: 1 = moving right
         self.is_move_left = False
         self.is_move_right = False
         self.is_jump = False
@@ -34,71 +46,66 @@ class Player(pygame.sprite.Sprite):
         self.image = self.image_idle
         self.rect = self.image.get_rect(topleft=(self.posx, self.posy))
 
+    def check_grounding(self):
+        """ See if the player is on the ground. Used to see if we can jump.
+
+        From pymunk platformer example
+        """
+        grounding = {
+            'normal': pymunk.Vec2d.zero(),
+            'penetration': pymunk.Vec2d.zero(),
+            'impulse': pymunk.Vec2d.zero(),
+            'position': pymunk.Vec2d.zero(),
+            'body': None
+        }
+
+        def f(arbiter):
+            n = -arbiter.contact_point_set.normal
+            if n.y > grounding['normal'].y:
+                grounding['normal'] = n
+                grounding['penetration'] = -arbiter.contact_point_set.points[0].distance
+                grounding['body'] = arbiter.shapes[1].body
+                grounding['impulse'] = arbiter.total_impulse
+                grounding['position'] = arbiter.contact_point_set.points[0].point_b
+
+        self.body.each_arbiter(f)
+
+        return grounding
+
     def handle_key_down(self, key):
         if key == self.k_move_left:
-            self.is_move_left = True
+            # Add force to the player, and set the player friction to basic one
+            self.force = (-s.PLAYER_MOVE_FORCE, 0)
+            self.shape.friction = self.friction
             self.image = self.image_left
         if key == self.k_move_right:
-            self.is_move_right = True
+            # Add force to the player, and set the player friction to basic one
+            self.force = (s.PLAYER_MOVE_FORCE, 0)
+            self.shape.friction = self.friction
             self.image = self.image_right
         elif key == self.k_jump:
-            self.is_jump = True
+            # find out if player is standing on ground
+            grounding = self.check_grounding()
+            if grounding['body'] is not None and abs(
+                    grounding['normal'].x / grounding['normal'].y) < self.shape.friction:
+                self.body.apply_impulse_at_local_point((0, s.PLAYER_JUMP_IMPULSE))
 
     def handle_key_up(self, key):
         if key == self.k_move_left:
-            self.is_move_left = False
+            # Remove force from the player, and set the player friction to a high number so he stops
+            self.force = (0, 0)
+            self.shape.friction = 1
 
         if key == self.k_move_right:
-            self.is_move_right = False
-
-    def activate_gravity(self, state: bool):
-        """On and off gravity/y-acceleration"""
-        self.is_stand = not state
-
-    def physics(self):
-        """Calculates player velocity and acceleration
-
-        If you want the Player to speed up or slow down then change these constants:
-        PLAYER_ACCELERATION and PLAYER_FRICTION for player speed
-        PLAYER_JUMP_HEIGHT for jump height
-        """
-        self.acc = Vector2(0, 0)
-
-        if self.is_stand is False:
-            self.acc.y = s.PLAYER_GRAVITY
-        else:
-            self.vel.y = 1  # It will entail collision and remain is_stand_on_tile in True state.
-
-        if self.is_move_left is True:
-            self.acc.x = -s.PLAYER_ACCELERATION
-            self.change_image("image_left")
-        if self.is_move_right is True:
-            self.acc.x = s.PLAYER_ACCELERATION
-            self.change_image("image_right")
-
-        if self.is_jump and self.is_stand:
-            self.jump()
-        else:
-            self.is_jump = False
-
-        self.acc.x += self.vel.x * s.PLAYER_FRICTION
-        self.vel += self.acc
-
-    def jump(self):
-        self.vel.y = -s.PLAYER_JUMP_HEIGHT
-
-    def move_player(self):
-        x_offset = self.vel.x + (0.5 * self.acc.x)  # kinematics formula
-        y_offset = self.vel.y
-        self.rect.move_ip((x_offset, y_offset))
+            # Remove force from the player, and set the player friction to a high number so he stops
+            self.force = (0, 0)
+            self.shape.friction = 1
 
     def update(self, *args):
-        """Change player state
+        self.rect.center = s.flip_y(self.body.position)  # synchronizes player rect with pymunk player shape
 
-        This method will be called every iteration of gameloop
-        """
-        self.physics()
-        self.move_player()
+        # If we have force to apply to the player (from hitting the arrow keys), apply it. (left-right)
+        self.body.apply_force_at_local_point(self.force, (0, 0))
 
     def change_image(self, image_name):
         if image_name == "image_right":
