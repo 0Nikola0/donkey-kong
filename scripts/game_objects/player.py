@@ -13,7 +13,7 @@ class Player(pygame.sprite.Sprite):
         pm_x, pm_y = x, s.flip_y(y)
         self.body.position = pm_x + s.PLAYER_SIZE_X // 2, pm_y - s.PLAYER_SIZE_Y // 2  # body.position == rect.center
         self.shape = pymunk.Poly.create_box(self.body, s.PLAYER_SIZE)
-        self.shape.elasticity = 1
+        self.shape.elasticity = s.PLAYER_ELASTICITY
         self.friction = s.PLAYER_FRICTION
         self.shape.friction = self.friction
         space.add(self.body, self.shape)
@@ -101,7 +101,7 @@ class Player(pygame.sprite.Sprite):
 
         if self.move_left_k_pressed is True:
             # Add force to the player, and set the player friction to basic one
-            self.force = (-s.PLAYER_MOVE_FORCE, 0)
+            self.force = (-s.PLAYER_MOVE_FORCE, 100)
             self.shape.friction = self.friction
         if self.move_right_k_pressed is True:
             # Add force to the player, and set the player friction to basic one

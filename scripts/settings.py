@@ -21,9 +21,10 @@ TILE_SIZE = 50
 NUM_TILES_IN_ROW = SCREEN_WIDTH // TILE_SIZE
 NUM_TILES_IN_COLUMN = SCREEN_HEIGHT // TILE_SIZE
 
-# Physics
+# Global physics
 GRAVITY = 0, -1000
 BASIC_FRICTION = .5
+BASIC_ELASTICITY = 1
 
 # Player properties
 PLAYER_SIZE = (PLAYER_SIZE_X, PLAYER_SIZE_Y) = 40, 60
@@ -32,6 +33,11 @@ PLAYER_MOVE_FORCE = 250
 PLAYER_JUMP_IMPULSE = 600
 
 PLAYER_FRICTION = .05
+PLAYER_ELASTICITY = BASIC_ELASTICITY
+
+# Tiles properties
+TILE_FRICTION = BASIC_FRICTION
+TILE_ELASTICITY = .3
 
 # levels
 LEVEL01 = "level01"
@@ -50,11 +56,11 @@ def flip_y(pos):
     """
     # if type(pos) is tuple or type(pos) is list:
     try:
-        return pos[0], -pos[1] + 600
+        return pos[0], SCREEN_HEIGHT - pos[1]
     except TypeError:
         # else:
         y = pos
-        return -y + 600
+        return SCREEN_HEIGHT - y
 
 
 # # Controllers # #

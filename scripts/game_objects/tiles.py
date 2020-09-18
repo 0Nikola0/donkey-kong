@@ -11,8 +11,8 @@ class Tiles(pygame.sprite.Sprite):
         pos_x, pos_y = s.flip_y(pos)
         self.body.position = pos_x + s.TILE_SIZE // 2, pos_y - s.TILE_SIZE // 2  # body.position == rect.center
         self.shape = pymunk.Poly.create_box(self.body, (s.TILE_SIZE, s.TILE_SIZE))
-        self.shape.friction = s.BASIC_FRICTION
-        self.shape.elasticity = 0
+        self.shape.friction = s.TILE_FRICTION
+        self.shape.elasticity = s.TILE_ELASTICITY
         space.add(self.shape)
 
         # pygame stuff
