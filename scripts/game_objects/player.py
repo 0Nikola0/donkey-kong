@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
         self.body = pymunk.Body(mass=1, moment=pymunk.inf, body_type=pymunk.Body.DYNAMIC)
         pm_x, pm_y = x, s.flip_y(y)
         self.body.position = pm_x + s.PLAYER_SIZE_X // 2, pm_y - s.PLAYER_SIZE_Y // 2  # body.position == rect.center
-        self.shape = pymunk.Poly.create_box(self.body, s.PLAYER_SIZE)
+        self.shape = pymunk.Poly.create_box(self.body, s.PLAYER_SIZE, radius=s.PLAYER_SHAPE_RADIUS)
         self.shape.elasticity = s.PLAYER_ELASTICITY
         self.friction = s.PLAYER_FRICTION
         self.shape.friction = self.friction
